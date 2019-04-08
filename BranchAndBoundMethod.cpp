@@ -3,49 +3,52 @@
 using namespace std;
 
 struct point{
-  int x,y;
-}
+    int x,y;
+};
+
 
 //对归约矩阵进行迭代增广，获取最小耗费
-int augment(int c_size,int **graph,int sum,int *visitX,int* visitY){
+float augment(int c_size,float **graph,float sum,int *visitX,int* visitY){
+    int i,j;
     queue<point> points;
-    for(int i=0;i<c_size;i++)
-        for(int j=0;j<c_size;j++)
+    for(i=0;i<c_size;i++)
+        for(j=0;j<c_size;j++)
             if(graph[i][j]==0)
                 points.push({i,j});
     if(points.empty())
         return sum;
-    
-    int cx,cy,fx=points.front().x,fy=points.front.y;
-    int key;
-    int minX,minY;
-    int cost=0,cost1=0;
+
+    int cx,cy,fx=points.front().x,fy=points.front().y;
+    float key;
+    float minX,minY;
+    float cost=0,cost1=0;
+
     while(!points.empty()){
         minX=minY=0x7fffffff;
-        cx=points.front.x;
-        cy=points.front.y;
+        cx=points.front().x;
+        cy=points.front().y;
         key=graph[cx][cy];
         graph[cx][cy]=-1;
-        for(int i=0;i<c_size;i++){
-            if(graph[cx][i]>=0&&graph[cx][i]<minX)
-                minX=graph[cx][i];
-            if(graph[i][cy]>=0&&graph[i][cy]<minY)
+        for(i=0;i<c_size;i++) {
+            if (graph[cx][i]>=0&&graph[cx][i] < minX)
+                minX = graph[cx][i];
+            if (graph[i][cy]>=0&&graph[i][cy]<minY)
                 minY=graph[i][cy];
         }
-        if(cost<=minX+minY&&minX!=0x7fffffff&&minY!=0x7fffffff){
-            cost=minX+minY;
+        if(cost<=minX+minY&&minX!=0x7fffffff&&minY!=0x7fffffff) {
+            cost = minX + minY;
             fx=cx,fy=cy;
         }
         points.pop();
         graph[cx][cy]=key;
     }
     graph[fx][fy]=-1;
-    
-    int **graph_t=new int*[c_size];
-    for(int i=0;i<c_size;i++)
-        graph_t[i]=new int[c_size];
-    for(int i=0;i<c_size;i++)
-        for(int j=0;j<c_size;j++)
+
+    float **graph_t=new float*[c_size];
+    for(i=0;i<c_size;i++)
+        graph_t[i]=new float[c_size];
+    for(i=0;i<c_size;i++)
+        for(j=0;j<c_size;j++)
             if(i==fx||j==fy)
                 graph_t[i][j]=-1;
             else
@@ -53,23 +56,23 @@ int augment(int c_size,int **graph,int sum,int *visitX,int* visitY){
     visitX[fx]=1;
     visitY[fy]=1;
     graph_t[fy][fx]=-1;
-    for(int i=0;i<c_size;i++){
-        minX=0x7fffffff;
-        for(int j=0;j<c_size;j++)
-            if(visitX[i]==0&&graph_t[i][j]>=0&&graph_t[i][j]<minX)
+    for(i=0;i<c_size;i++) {
+        minX = 0x7fffffff;
+        for (j = 0; j < c_size; j++)
+            if (visitX[i]==0&&graph_t[i][j]>=0&&graph_t[i][j]<minX)
                 minX=graph_t[i][j];
         if(minX>0&&minX<0x7fffffff) {
-            for(int j=0;j<c_size;j++)
+            for(j=0;j<c_size;j++)
                 if(graph_t[i][j]>0)
                     graph_t[i][j]-=minX;
             cost1 += minX;
         }
         minY=0x7fffffff;
-        for(int j=0;j<c_size;j++)
+        for(j=0;j<c_size;j++)
             if(visitY[i]==0&&graph_t[j][i]>=0&&graph_t[j][i]<minY)
                 minY=graph_t[j][i];
         if(minY>0&&minY<0x7fffffff) {
-            for(int j=0;j<c_size;j++)
+            for(j=0;j<c_size;j++)
                 if(graph_t[j][i]>0)
                     graph_t[j][i]-=minY;
             cost1 += minY;
@@ -87,30 +90,31 @@ int augment(int c_size,int **graph,int sum,int *visitX,int* visitY){
 
 
 //获取原始矩阵的归约矩阵，其中-1表示正无穷
-int statute(int c_size,int **graph){
-    int sum=0;
-    int min_row,min_col;
-    for(int i=0;i<c_size;i++) {
+float statute(int c_size,float **graph){
+    float sum=0;
+    float min_row,min_col;
+    int i,j;
+    for(i=0;i<c_size;i++) {
         min_row = 0x7fffffff;
-        for (int j = 0; j < c_size; j++) {
+        for (j = 0; j < c_size; j++) {
             if (graph[i][j] >= 0 && graph[i][j] < min_row)
                 min_row = graph[i][j];
         }
         if(min_row>0) {
-            for (int j = 0; j < c_size; j++)
+            for (j = 0; j < c_size; j++)
                 if (graph[i][j] > 0)
                     graph[i][j] -= min_row;
             sum+=min_row;
         }
     }
-    for(int i=0;i<c_size;i++){
+    for(i=0;i<c_size;i++){
         min_col = 0x7fffffff;
-        for (int j = 0; j < c_size; j++) {
+        for (j = 0; j < c_size; j++) {
             if (graph[j][i] >= 0 && graph[j][i] < min_col)
                 min_col = graph[j][i];
         }
         if(min_col>0){
-            for(int j=0;j<c_size;j++)
+            for(j=0;j<c_size;j++)
                 if(graph[j][i]>0)
                     graph[j][i]-=min_col;
             sum+=min_col;
@@ -126,13 +130,14 @@ int statute(int c_size,int **graph){
 
 
 int main(){
+    int i,j;
     int c_size;         //city size
     cin>>c_size;
-    int **graph=new int*[c_size];
-    for(int i=0;i<c_size;i++)
-        graph[i]=new int[c_size];
-    for(int i=0;i<c_size;i++)
-        for(int j=0;j<c_size;j++)
+    float **graph=new float*[c_size];
+    for(i=0;i<c_size;i++)
+        graph[i]=new float[c_size];
+    for(i=0;i<c_size;i++)
+        for(j=0;j<c_size;j++)
             cin>>graph[i][j];
     cout<<statute(c_size,graph);
 
@@ -151,6 +156,32 @@ input:
 
 output:
 67
+
+input:
+4
+-1 10 15 -1
+10 -1 35 25
+15 35 -1 30
+-1 25 30 -1
+ 
+output:
+80
+
+input:
+10
+-1 2538.94 2873.8 2575.27 2318.1 2158.71 2216.58 3174.04 3371.13 3540.24
+2538.94 -1 1073.54 111.288 266.835 395.032 410.118 637.942 853.554 1055
+2873.8 1073.54 -1 964.495 988.636 1094.32 1382.73 1240.15 1460.25 1687
+2575.27 111.288 964.495 -1 262.053 416.707 503.563 624.725 854.916 1068.42
+2318.1 266.835 988.636 262.053 -1 163.355 395.14 885 1110.86 1318.19
+2158.71 395.032 1094.32 416.707 163.355 -1 338.634 1030.34 1248.58 1447.69
+2216.58 410.118 1382.73 503.563 395.14 338.634 -1 984.068 1160.26 1323.7
+3174.04 637.942 1240.15 624.725 885 1030.34 984.068 -1 243.417 473.768
+3371.13 853.554 1460.25 854.916 1110.86 1248.58 1160.26 243.417 -1 232.112
+3540.24 1055 1687 1068.42 1318.19 1447.69 1323.7 473.768 232.112 -1
+
+output:
+7884.28
 
  *
  */
